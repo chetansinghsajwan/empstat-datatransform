@@ -1,7 +1,5 @@
-# %%
-
 from datetime import datetime
-from logger import create_logger
+from .logger import create_logger
 import pandas as pd
 import os
 import re
@@ -307,7 +305,9 @@ def clean_assessments(
         # Map training_id to subject_id
         subject_id = training_subject_map.get(training_id)
         if not subject_id:
-            logger.debug(f"discarded assessment due to missing subjectId for: {user_id}")
+            logger.debug(
+                f"discarded assessment due to missing subjectId for: {user_id}"
+            )
             continue
 
         # Clean marks
@@ -359,72 +359,69 @@ def validate_datetime(date_string):
         return False
 
 
-# %%
+def run():
+    stage_users, stage_subjects, stage_trainings, stage_assessments = (
+        load_stage_outputs()
+    )
 
-stage_users, stage_subjects, stage_trainings, stage_assessments = load_stage_outputs()
+    # clean users
+    prep_users = clean_users(stage_users)
+    user_discard_count = stage_users.size - prep_users.size
+    logger.info(
+        f"cleaned users, count: {prep_users.size}, discarded: {user_discard_count}"
+    )
 
-# %%
+    # clean subjects
+    prep_subjects = clean_subjects(stage_subjects)
+    subject_discard_count = stage_subjects.size - prep_subjects.size
+    logger.info(
+        f"cleaned subjects, count: {prep_subjects.size}, discarded: {subject_discard_count}"
+    )
 
-# clean users
-prep_users = clean_users(stage_users)
-user_discard_count = stage_users.size - prep_users.size
-logger.info(f"cleaned users, count: {prep_users.size}, discarded: {user_discard_count}")
+    valid_subject_ids = prep_subjects["id"].tolist()
 
-# %%
+    # clean trainings
+    prep_trainings = clean_trainings(stage_trainings, valid_subject_ids)
+    training_discard_count = stage_trainings.size - prep_trainings.size
+    logger.info(
+        f"cleaned trainings, count: {prep_trainings.size}, discarded: {training_discard_count}"
+    )
 
-# clean subjects
-prep_subjects = clean_subjects(stage_subjects)
-subject_discard_count = stage_subjects.size - prep_subjects.size
-logger.info(
-    f"cleaned subjects, count: {prep_subjects.size}, discarded: {subject_discard_count}"
-)
+    valid_user_ids = prep_users["id"].tolist()
+    valid_training_ids = prep_trainings["id"].tolist()
+    subject_max_marks = prep_subjects.set_index("id")["maxMarks"].to_dict()
+    training_subject_map = prep_trainings.set_index("id")["subjectId"].to_dict()
 
-valid_subject_ids = prep_subjects["id"].tolist()
+    # clean assessments
+    prep_assessments = clean_assessments(
+        stage_assessments,
+        valid_user_ids,
+        valid_training_ids,
+        subject_max_marks,
+        training_subject_map,
+    )
+    assessment_discard_count = stage_assessments.size - prep_assessments.size
+    logger.info(
+        f"cleaned assessments, count: {prep_assessments.size}, discarded: {assessment_discard_count}"
+    )
 
-# %%
+    if not os.path.exists(options.output_folder):
+        os.makedirs(options.output_folder)
 
-# clean trainings
-prep_trainings = clean_trainings(stage_trainings, valid_subject_ids)
-training_discard_count = stage_trainings.size - prep_trainings.size
-logger.info(
-    f"cleaned trainings, count: {prep_trainings.size}, discarded: {training_discard_count}"
-)
+    # csv file paths
+    prep_users_path = os.path.join(options.output_folder, "users.csv")
+    prep_subjects_path = os.path.join(options.output_folder, "subjects.csv")
+    prep_trainings_path = os.path.join(options.output_folder, "trainings.csv")
+    prep_assessments_path = os.path.join(options.output_folder, "assessments.csv")
 
-# %%
+    # save cleaned data to csv files
+    prep_users.to_csv(prep_users_path, index=False)
+    prep_subjects.to_csv(prep_subjects_path, index=False)
+    prep_trainings.to_csv(prep_trainings_path, index=False)
+    prep_assessments.to_csv(prep_assessments_path, index=False)
 
-valid_user_ids = prep_users["id"].tolist()
-valid_training_ids = prep_trainings["id"].tolist()
-subject_max_marks = prep_subjects.set_index("id")["maxMarks"].to_dict()
-training_subject_map = prep_trainings.set_index("id")["subjectId"].to_dict()
+    logger.info("data cleaning completed and saved to output folder.")
 
-# %%
 
-# clean assessments
-prep_assessments = clean_assessments(
-    stage_assessments,
-    valid_user_ids,
-    valid_training_ids,
-    subject_max_marks,
-    training_subject_map,
-)
-assessment_discard_count = stage_assessments.size - prep_assessments.size
-logger.info(
-    f"cleaned assessments, count: {prep_assessments.size}, discarded: {assessment_discard_count}"
-)
-
-# %%
-
-if not os.path.exists(options.output_folder):
-    os.makedirs(options.output_folder)
-
-# save cleaned data to csv files
-prep_users.to_csv(os.path.join(options.output_folder, "users.csv"), index=False)
-prep_subjects.to_csv(os.path.join(options.output_folder, "subjects.csv"), index=False)
-prep_trainings.to_csv(os.path.join(options.output_folder, "trainings.csv"), index=False)
-prep_assessments.to_csv(
-    os.path.join(options.output_folder, "assessments.csv"), index=False
-)
-
-logger.info("data cleaning completed and saved to output folder.")
-
-# %%
+if __name__ == "__main__":
+    run()

@@ -2,7 +2,7 @@ from faker import Faker
 import random
 import csv
 import os
-from logger import create_logger
+from .logger import create_logger
 
 logger = create_logger("fake")
 
@@ -214,7 +214,7 @@ def save_to_csv(data, filename, fieldnames):
 
 
 # main function
-def main():
+def run():
 
     logger.info(f"generating datasets with unclean_ratio '{options.unclean_ratio}'...")
 
@@ -254,4 +254,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()

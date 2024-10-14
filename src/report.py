@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from logger import create_logger
+from .logger import create_logger
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
@@ -33,6 +33,7 @@ class Destination:
 
     def __init__(self, db_url):
         self.engine = create_engine(db_url)
+        self.engine.connect()
 
     def insert_data(self, dataframe, table_name):
         """Insert DataFrame data into the specified PostgreSQL table."""
@@ -44,11 +45,11 @@ class Destination:
 
 
 def load_source(file_name: str) -> Source:
-    file_path = os.path.join(prep_folder, file_name)
+    file_path = os.path.join(prep_folder, file_name) + ".csv"
     return Source(file_path)
 
 
-def main():
+def run():
 
     # connecting to the database
     logger.info(f"connecting to database '{db_url}'...")
@@ -73,4 +74,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
