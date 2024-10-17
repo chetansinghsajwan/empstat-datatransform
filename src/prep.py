@@ -176,7 +176,13 @@ def clean_subjects(subjects):
             }
         )
 
-    return pd.DataFrame(cleaned_subjects)
+    df = pd.DataFrame(cleaned_subjects)
+
+    df["min_marks"] = df["min_marks"].astype(int)
+    df["max_marks"] = df["max_marks"].astype(int)
+    df["total_time"] = df["total_time"].astype(int)
+
+    return df
 
 
 # Validate and clean training records
@@ -336,7 +342,11 @@ def clean_assessments(
                 "internet_allowed": internet_allowed,
             }
         )
-    return pd.DataFrame(cleaned_assessments)
+
+    df = pd.DataFrame(cleaned_assessments)
+    df["marks"] = df["marks"].astype(int)
+
+    return df
 
 
 # Helper Functions
