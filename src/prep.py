@@ -50,8 +50,8 @@ def clean_users(users):
                         "middle_name",
                         "last_name",
                         "role",
-                        "createdAt",
-                        "updatedAt",
+                        "created_at",
+                        "updated_at",
                     ]
                 ]
             )
@@ -87,17 +87,17 @@ def clean_users(users):
             continue
         prep_user["role"] = role
 
-        # Validate createdAt and updatedAt
-        created_at = row["createdAt"]
-        updated_at = row["updatedAt"]
+        # Validate created_at and updated_at
+        created_at = row["created_at"]
+        updated_at = row["updated_at"]
         if not validate_datetime(created_at):
-            logger.debug(f"discarded user due to invalid createdAt: {user_id}")
+            logger.debug(f"discarded user due to invalid created_at: {user_id}")
             continue
-        prep_user["createdAt"] = created_at
+        prep_user["created_at"] = created_at
         if not validate_datetime(updated_at) or updated_at <= created_at:
-            logger.debug(f"discarded user due to invalid updatedAt: {user_id}")
+            logger.debug(f"discarded user due to invalid updated_at: {user_id}")
             continue
-        prep_user["updatedAt"] = updated_at
+        prep_user["updated_at"] = updated_at
 
         cleaned_users.append(prep_user)
 
@@ -118,11 +118,11 @@ def clean_subjects(subjects):
                     [
                         "id",
                         "name",
-                        "minMarks",
-                        "maxMarks",
-                        "totalTime",
-                        "createdAt",
-                        "updatedAt",
+                        "min_marks",
+                        "max_marks",
+                        "total_time",
+                        "created_at",
+                        "updated_at",
                     ]
                 ]
             )
@@ -144,35 +144,35 @@ def clean_subjects(subjects):
             logger.debug(f"discarded subject due to invalid name: {subject_id}")
             continue
 
-        # Clean minMarks, maxMarks, totalTime
-        min_marks = row["minMarks"]
-        max_marks = row["maxMarks"]
-        total_time = row["totalTime"]
+        # Clean min_marks, max_marks, total_time
+        min_marks = row["min_marks"]
+        max_marks = row["max_marks"]
+        total_time = row["total_time"]
         if min_marks < 0 or max_marks < min_marks or total_time < 0:
             logger.debug(
-                f"discarded subject due to invalid marks or totalTime: {subject_id}"
+                f"discarded subject due to invalid marks or total_time: {subject_id}"
             )
             continue
 
-        # Validate createdAt and updatedAt
-        created_at = row["createdAt"]
-        updated_at = row["updatedAt"]
+        # Validate created_at and updated_at
+        created_at = row["created_at"]
+        updated_at = row["updated_at"]
         if not validate_datetime(created_at):
-            logger.debug(f"discarded subject due to invalid createdAt: {subject_id}")
+            logger.debug(f"discarded subject due to invalid created_at: {subject_id}")
             continue
         if not validate_datetime(updated_at) or updated_at <= created_at:
-            logger.debug(f"discarded subject due to invalid updatedAt: {subject_id}")
+            logger.debug(f"discarded subject due to invalid updated_at: {subject_id}")
             continue
 
         cleaned_subjects.append(
             {
                 "id": subject_id.lower(),
                 "name": name.strip(),
-                "minMarks": min_marks,
-                "maxMarks": max_marks,
-                "totalTime": total_time,
-                "createdAt": created_at,
-                "updatedAt": updated_at,
+                "min_marks": min_marks,
+                "max_marks": max_marks,
+                "total_time": total_time,
+                "created_at": created_at,
+                "updated_at": updated_at,
             }
         )
 
@@ -194,15 +194,15 @@ def clean_trainings(trainings, valid_subject_ids):
                         "id",
                         "name",
                         "mode",
-                        "subjectId",
-                        "startedAt",
-                        "endedAt",
-                        "createdAt",
-                        "updatedAt",
+                        "subject_id",
+                        "started_at",
+                        "ended_at",
+                        "created_at",
+                        "updated_at",
                     ]
                 ]
             )
-        ) or any(row[["id", "name", "mode", "subjectId"]] == ""):
+        ) or any(row[["id", "name", "mode", "subject_id"]] == ""):
             logger.debug(f"discarded training due to null or empty values: {row["id"]}")
             continue
 
@@ -226,30 +226,30 @@ def clean_trainings(trainings, valid_subject_ids):
             logger.debug(f"discarded training due to invalid mode: {training_id}")
             continue
 
-        # Clean subjectId
-        subject_id = row["subjectId"]
+        # Clean subject_id
+        subject_id = row["subject_id"]
         if subject_id not in valid_subject_ids:
-            logger.debug(f"discarded training due to invalid subjectId: {training_id}")
+            logger.debug(f"discarded training due to invalid subject_id: {training_id}")
             continue
 
-        # Validate startedAt and endedAt
-        started_at = row["startedAt"]
-        ended_at = row["endedAt"]
+        # Validate started_at and ended_at
+        started_at = row["started_at"]
+        ended_at = row["ended_at"]
         if not validate_datetime(started_at):
-            logger.debug(f"discarded training due to invalid startedAt: {training_id}")
+            logger.debug(f"discarded training due to invalid started_at: {training_id}")
             continue
         if ended_at and ended_at <= started_at:
-            logger.debug(f"discarded training due to invalid endedAt: {training_id}")
+            logger.debug(f"discarded training due to invalid ended_at: {training_id}")
             continue
 
-        # Validate createdAt and updatedAt
-        created_at = row["createdAt"]
-        updated_at = row["updatedAt"]
+        # Validate created_at and updated_at
+        created_at = row["created_at"]
+        updated_at = row["updated_at"]
         if not validate_datetime(created_at):
-            logger.debug(f"discarded training due to invalid createdAt: {training_id}")
+            logger.debug(f"discarded training due to invalid created_at: {training_id}")
             continue
         if not validate_datetime(updated_at) or updated_at <= created_at:
-            logger.debug(f"discarded training due to invalid updatedAt: {training_id}")
+            logger.debug(f"discarded training due to invalid updated_at: {training_id}")
             continue
 
         cleaned_trainings.append(
@@ -257,11 +257,11 @@ def clean_trainings(trainings, valid_subject_ids):
                 "id": training_id.lower(),
                 "name": name.strip(),
                 "mode": mode,
-                "subjectId": subject_id,
-                "startedAt": started_at,
-                "endedAt": ended_at,
-                "createdAt": created_at,
-                "updatedAt": updated_at,
+                "subject_id": subject_id,
+                "started_at": started_at,
+                "ended_at": ended_at,
+                "created_at": created_at,
+                "updated_at": updated_at,
             }
         )
 
@@ -283,30 +283,30 @@ def clean_assessments(
 
         # Check for null or empty values
         if any(
-            pd.isnull(row[["userId", "trainingId", "marks", "internetAllowed"]])
-        ) or any(row[["userId", "trainingId", "marks", "internetAllowed"]] == ""):
+            pd.isnull(row[["user_id", "training_id", "marks", "internet_allowed"]])
+        ) or any(row[["user_id", "training_id", "marks", "internet_allowed"]] == ""):
             logger.debug(
-                f"discarded assessment due to null or empty values: {row['userId']}"
+                f"discarded assessment due to null or empty values: {row['user_id']}"
             )
             continue
 
-        # Clean userId
-        user_id = row["userId"]
+        # Clean user_id
+        user_id = row["user_id"]
         if user_id not in valid_user_ids:
-            logger.debug(f"discarded assessment due to invalid userId: {user_id}")
+            logger.debug(f"discarded assessment due to invalid user_id: {user_id}")
             continue
 
-        # Clean trainingId
-        training_id = row["trainingId"]
+        # Clean training_id
+        training_id = row["training_id"]
         if training_id not in valid_training_ids:
-            logger.debug(f"discarded assessment due to invalid trainingId: {user_id}")
+            logger.debug(f"discarded assessment due to invalid training_id: {user_id}")
             continue
 
         # Map training_id to subject_id
         subject_id = training_subject_map.get(training_id)
         if not subject_id:
             logger.debug(
-                f"discarded assessment due to missing subjectId for: {user_id}"
+                f"discarded assessment due to missing subject_id for: {user_id}"
             )
             continue
 
@@ -320,20 +320,20 @@ def clean_assessments(
             logger.debug(f"discarded assessment due to invalid marks: {user_id}")
             continue
 
-        # Clean internetAllowed
-        internet_allowed = row["internetAllowed"]
+        # Clean internet_allowed
+        internet_allowed = row["internet_allowed"]
         if not isinstance(internet_allowed, bool):
             logger.debug(
-                f"discarded assessment due to invalid internetAllowed value: {user_id}"
+                f"discarded assessment due to invalid internet_allowed value: {user_id}"
             )
             continue
 
         cleaned_assessments.append(
             {
-                "userId": user_id,
-                "trainingId": training_id,
+                "user_id": user_id,
+                "training_id": training_id,
                 "marks": marks,
-                "internetAllowed": internet_allowed,
+                "internet_allowed": internet_allowed,
             }
         )
     return pd.DataFrame(cleaned_assessments)
@@ -389,8 +389,8 @@ def run():
 
     valid_user_ids = prep_users["id"].tolist()
     valid_training_ids = prep_trainings["id"].tolist()
-    subject_max_marks = prep_subjects.set_index("id")["maxMarks"].to_dict()
-    training_subject_map = prep_trainings.set_index("id")["subjectId"].to_dict()
+    subject_max_marks = prep_subjects.set_index("id")["max_marks"].to_dict()
+    training_subject_map = prep_trainings.set_index("id")["subject_id"].to_dict()
 
     # clean assessments
     prep_assessments = clean_assessments(
