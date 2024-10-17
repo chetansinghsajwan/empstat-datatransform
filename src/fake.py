@@ -180,6 +180,7 @@ def generate_trainings():
 # generate fake assessments with unclean data
 def generate_assessments():
 
+    options.unclean_percentage = 0
     for _ in range(options.assessment_count):
         user = random.choice(context.users)
         training = random.choice(context.trainings)
