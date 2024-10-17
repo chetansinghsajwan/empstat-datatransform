@@ -5,15 +5,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get install -y \
     python3 \
-    python3-pip
-
-# RUN pip3 install pandas sqlalchemy
-RUN apt-get install -y \
     faker \
-    python3-pandas \
-    python3-sqlalchemy \
-    python3-dotenv \
-    python3-psycopg2
+    python3-pandas
 
 WORKDIR /root/src
 COPY . .
