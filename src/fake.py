@@ -9,10 +9,10 @@ logger = create_logger("fake")
 
 # options to configure output
 class Options:
-    user_count = 10000
-    subject_count = 100000
-    training_count = 100000
-    assessment_count = 100000
+    user_count = 100
+    subject_count = 1000
+    training_count = 1000
+    assessment_count = 1000
     user_roles = ["admin", "employee", "manager", "none"]
     training_modes = ["online", "offline", "onsite", "remote"]
     user_fields = [
@@ -31,7 +31,6 @@ class Options:
         "minMarks",
         "maxMarks",
         "totalTime",
-        "trainingId",
         "createdBy",
         "createdAt",
         "updatedAt",
@@ -47,14 +46,14 @@ class Options:
         "updatedAt",
     ]
     assessment_fields = ["userId", "trainingId", "marks", "internetAllowed"]
-    out_dir = "out/inputs"
+    out_dir = "out/input"
     user_file = "users.csv"
     subject_file = "subjects.csv"
     training_file = "trainings.csv"
     assessment_file = "assessments.csv"
 
     # Set the unclean ratio here (0 to 1, higher = more unclean data)
-    unclean_ratio = 0.3
+    unclean_percentage = 10
 
 
 options = Options()
@@ -77,7 +76,7 @@ def make_choice(clean_value, unclean_value):
 
     return random.choices(
         [clean_value, unclean_value],
-        weights=[1 - options.unclean_ratio, options.unclean_ratio],
+        weights=[100 - options.unclean_percentage, options.unclean_percentage],
     )[0]
 
 
@@ -216,7 +215,9 @@ def save_to_csv(data, filename, fieldnames):
 # main function
 def run():
 
-    logger.info(f"generating datasets with unclean_ratio '{options.unclean_ratio}'...")
+    logger.info(
+        f"generating datasets with unclean_percentage '{options.unclean_percentage}'..."
+    )
 
     # generate datasets
     logger.info("generating users...")
