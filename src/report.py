@@ -88,7 +88,7 @@ def run():
     report_data = generate_report(users, subjects, trainings, assessments)
 
     # Define the report file path
-    report_file_path = os.path.join(options.report_dir, "performance_report.csv")
+    report_file_path = os.path.join(options.report_dir, "report.csv")
 
     # Save the report
     save_report(report_data, report_file_path)
