@@ -238,22 +238,26 @@ def clean_trainings(trainings, valid_subject_ids):
             logger.debug(f"discarded training due to invalid subject_id: {training_id}")
             continue
 
-        # Validate started_at and ended_at
+        # Validate started_at
         started_at = row["started_at"]
-        ended_at = row["ended_at"]
         if not validate_datetime(started_at):
             logger.debug(f"discarded training due to invalid started_at: {training_id}")
             continue
-        if ended_at and ended_at <= started_at:
+
+        # Validate ended_at
+        ended_at = row["ended_at"]
+        if not validate_datetime(ended_at) or ended_at <= started_at:
             logger.debug(f"discarded training due to invalid ended_at: {training_id}")
             continue
 
         # Validate created_at and updated_at
         created_at = row["created_at"]
-        updated_at = row["updated_at"]
         if not validate_datetime(created_at):
             logger.debug(f"discarded training due to invalid created_at: {training_id}")
             continue
+
+        # Validate updated_at
+        updated_at = row["updated_at"]
         if not validate_datetime(updated_at) or updated_at <= created_at:
             logger.debug(f"discarded training due to invalid updated_at: {training_id}")
             continue
